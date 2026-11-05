@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="pt-BR" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeWork SST - Gestão de Segurança do Trabalho</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#16a34a',
+                            600: '#15803d',
+                            700: '#15803d',
+                            800: '#166534',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Chart.js para visualizações gráficas no Dashboard -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        body { font-family: 'Inter', sans-serif; }
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="h-full flex flex-col md:flex-row overflow-hidden font-sans text-slate-800">
+
+    <!-- OVERLAY PARA MOBILE -->
+    <div id="sidebar-backdrop" onclick="toggleSidebar()" class="fixed inset-0 bg-slate-900/50 z-20 hidden md:hidden transition-opacity"></div>
+
+    <!-- BARRA LATERAL (SIDEBAR) -->
+    <aside id="sidebar" class="fixed md:static inset-y-0 left-0 w-64 bg-slate-900 text-slate-300 z-30 transform -translate-x-full md:translate-x-0 transition-transform duration-200 ease-in-out flex flex-col border-r border-slate-800">
+        <!-- Logo e Cabeçalho da Sidebar -->
+        <div class="h-16 flex items-center px-6 border-b border-slate-800 justify-between">
+            <div class="flex items-center gap-3">
+                <div class="p-2 bg-emerald-600 text-white rounded-lg shadow-sm">
+                    <i data-lucide="shield-check" class="w-6 h-6"></i>
+                </div>
+                <span class="font-bold text-lg text-white tracking-wide">SafeWork SST</span>
+            </div>
+            <button onclick="toggleSidebar()" class="md:hidden text-slate-400 hover:text-white">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+        </div>
+
+        <!-- Links do Menu (Menu idêntico ao anexo) -->
+        <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto custom-scrollbar" id="main-nav">
+            <button onclick="navigateTo('visao-geral')" data-page="visao-geral" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-150 text-slate-300 hover:bg-slate-800 hover:text-white">
+                <i data-lucide="home" class="w-5 h-5"></i>
+                <span>Visão geral</span>
+            </button>
+
+            <button onclick="navigateTo('integracao')" data-page="integracao" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-150 text-slate-300 hover:bg-slate-800 hover:text-white">
+                <i data-lucide="square-dot" class="w-5 h-5"></i>
+                <span>Integração</span>
+            </button>
+
+            <button onclick="navigateTo('conteudos')" data-page="conteudos" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-150 text-slate-300 hover:bg-slate-800 hover:text-white">
+                <i data-lucide="menu-square" class="w-5 h-5"></i>
+                <span>Conteúdos</span>
+            </button>
+
+            <button onclick="navigateTo('roteiro')" data-page="roteiro" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-150 text-slate-300 hover:bg-slate-800 hover:text-white">
+                <i data-lucide="sliders-horizontal" class="w-5 h-5"></i>
+                <span>Roteiro do instrutor</span>
+            </button>
+
+            <button onclick="navigateTo('checklist')" data-page="checklist" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-150 text-slate-300 hover:bg-slate-800 hover:text-white">
+                <i data-lucide="check-square" class="w-5 h-5"></i>
+                <span>Lista de verificação</span>
+            </button>
+
+            <button onclick="navigateTo('sobre')" data-page="sobre" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-150 text-slate-300 hover:bg-slate-800 hover:text-white">
+                <i data-lucide="info" class="w-5 h-5"></i>
+                <span>Sobre o projeto</span>
+            </button>
+
+            <button onclick="navigateTo('powerpoint')" data-page="powerpoint" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3 text-sm font-medium rounded-xl transition-all duration-150 text-slate-300 hover:bg-slate-800 hover:text-white">
+                <i data-lucide="presentation" class="w-5 h-5"></i>
+                <span>PowerPoint</span>
+            </button>
+        </nav>
+
+        <!-- Card de Usuário / Rodapé -->
+        <div class="p-4 border-t border-slate-800 flex items-center gap-3">
+            <img src="https://images.unsplash.com/photo-1560250097-0b93528c311a?w=100&auto=format&fit=crop&q=80" alt="Avatar" class="w-9 h-9 rounded-full object-cover ring-2 ring-emerald-500/30">
+            <div class="overflow-hidden">
+                <p class="text-sm font-semibold text-white truncate">João Pedro Caxias</p>
+                <p class="text-xs text-slate-400 truncate">Coordenador de SST</p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- ÁREA PRINCIPAL -->
+    <div class="flex-1 flex flex-col h-full overflow-hidden">
+        
+        <!-- HEADER TOP -->
+        <header class="h-16 bg-white border-b border-slate-200 flex items-center justify-between px-4 md:px-8 z-10">
+            <div class="flex items-center gap-3">
+                <button onclick="toggleSidebar()" class="md:hidden text-slate-600 hover:text-slate-900 p-2 rounded-lg hover:bg-slate-100">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+                <h1 id="page-title" class="text-xl font-bold text-slate-800">Visão geral</h1>
+            </div>
+
+            <!-- Busca & Notificações -->
+            <div class="flex items-center gap-4">
+                <div class="relative hidden sm:block">
+                    <i data-lucide="search" class="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                    <input type="text" placeholder="Pesquisar NR, norma, EPI..." class="pl-9 pr-4 py-1.5 text-sm rounded-lg border border-slate-200 focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500 w-48 lg:w-64">
+                </div>
+                <button class="relative p-2 rounded-lg text-slate-500 hover:bg-slate-100 hover:text-slate-700">
+                    <i data-lucide="bell" class="w-5 h-5"></i>
+                    <span class="absolute top-1.5 right-1.5 w-2 h-2 bg-emerald-500 rounded-full"></span>
+                </button>
+            </div>
+        </header>
+
+        <!-- CONTEÚDO DINÂMICO DAS PÁGINAS -->
+        <main class="flex-1 overflow-y-auto p-4 md:p-8 custom-scrollbar bg-slate-50">
+            
+            <!-- 1. VISÃO GERAL (INDEX DO SISTEMA) -->
+            <section id="page-visao-geral" class="page-content space-y-6">
+                <!-- Banner de Boas-Vindas SST -->
+                <div class="bg-gradient-to-r from-emerald-800 to-emerald-600 rounded-2xl p-6 md:p-8 text-white shadow-lg relative overflow-hidden">
+                    <div class="relative z-10 max-w-2xl">
+                        <span class="px-3 py-1 bg-white/20 text-white rounded-full text-xs font-bold uppercase tracking-wider mb-2 inline-block">Portal da Segurança</span>
+                        <h2 class="text-2xl md:text-3xl font-bold mb-2">Painel de Segurança do Trabalho</h2>
+                        <p class="text-emerald-100 text-sm md:text-base mb-6">Monitore indicadores de acidentes zero, conformidade com as NRs, inspeções operacionais e status das capacitações sob coordenação de João Pedro Caxias.</p>
+                        <div class="flex flex-wrap gap-3">
+                            <button onclick="navigateTo('integracao')" class="px-4 py-2 bg-white text-emerald-800 font-semibold text-sm rounded-lg shadow hover:bg-slate-100 transition-colors">Integração de Segurança</button>
+                            <button onclick="navigateTo('checklist')" class="px-4 py-2 bg-emerald-900/40 border border-emerald-300/30 text-white font-semibold text-sm rounded-lg hover:bg-emerald-900/60 transition-colors">Inspeção de Campo</button>
+                        </div>
+                    </div>
+                    <i data-lucide="shield" class="absolute -right-8 -bottom-8 w-64 h-64 text-white/10 pointer-events-none"></i>
+                </div>
+
+                <!-- Cards Estatísticos de SST -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+                    <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Dias Sem Acidentes</p>
+                            <h3 class="text-2xl font-bold text-emerald-600 mt-1">248 Dias</h3>
+                            <span class="text-xs font-semibold text-emerald-600 flex items-center gap-1 mt-1">
+                                <i data-lucide="trending-up" class="w-3.5 h-3.5"></i> Meta: 365 dias
+                            </span>
+                        </div>
+                        <div class="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
+                            <i data-lucide="award" class="w-6 h-6"></i>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Colaboradores Integrados</p>
+                            <h3 class="text-2xl font-bold text-slate-800 mt-1">892</h3>
+                            <span class="text-xs font-semibold text-emerald-600 flex items-center gap-1 mt-1">
+                                <i data-lucide="user-check" class="w-3.5 h-3.5"></i> 98% com Treinamento Ok
+                            </span>
+                        </div>
+                        <div class="p-3 bg-blue-50 text-blue-600 rounded-xl">
+                            <i data-lucide="users" class="w-6 h-6"></i>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">NRs Aplicadas</p>
+                            <h3 class="text-2xl font-bold text-slate-800 mt-1">6 Normas</h3>
+                            <span class="text-xs font-medium text-slate-400 mt-1 block">NR-06, NR-10, NR-33, NR-35...</span>
+                        </div>
+                        <div class="p-3 bg-purple-50 text-purple-600 rounded-xl">
+                            <i data-lucide="book-open" class="w-6 h-6"></i>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-5 rounded-xl border border-slate-200/80 shadow-sm flex items-center justify-between">
+                        <div>
+                            <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Inspeções CIPA</p>
+                            <h3 id="dash-pending-tasks" class="text-2xl font-bold text-slate-800 mt-1">3/6</h3>
+                            <span class="text-xs font-medium text-amber-600 mt-1 block">Vistorias Pendentes</span>
+                        </div>
+                        <div class="p-3 bg-amber-50 text-amber-600 rounded-xl">
+                            <i data-lucide="check-circle-2" class="w-6 h-6"></i>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Gráfico + Atalhos Rápidos SST -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm">
+                        <div class="flex items-center justify-between mb-4">
+                            <h3 class="font-bold text-slate-800">Conformidade e Quase-Acidentes Registrados</h3>
+                            <span class="text-xs text-slate-400">Mensal 2026</span>
+                        </div>
+                        <div class="h-64">
+                            <canvas id="engagementChart"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm flex flex-col justify-between">
+                        <div>
+                            <h3 class="font-bold text-slate-800 mb-4">Gestão Rápida de SST</h3>
+                            <div class="space-y-3">
+                                <button onclick="navigateTo('integracao')" class="w-full flex items-center justify-between p-3 rounded-lg hover:bg-slate-50 border border-slate-100 transition-colors group">
+                                    <div class="flex items-center gap-3">
+                                        <div class="p-2 bg-slate-100 text-slate-600 rounded-md group-hover:bg-emerald-50 group-hover:text-emerald-600">
+                                            <i data-lucide="square-dot" class="w-4 h-4"></i>
+                                        </div>
+                                        <span class="text-sm font-medium text-slate-700">Integração de Novos Funcionários</span>
+                                    </div>
+                                    <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+                                </button>
+                                <button onclick="navigateTo('roteiro')" class="w-full flex items-center justify-between p-3 rounded-lg hover:bg-slate-50 border border-slate-100 transition-colors group">
+                                    <div class="flex items-center gap-3">
+                                        <div class="p-2 bg-slate-100 text-slate-600 rounded-md group-hover:bg-emerald-50 group-hover:text-emerald-600">
+                                            <i data-lucide="sliders-horizontal" class="w-4 h-4"></i>
+                                        </div>
+                                        <span class="text-sm font-medium text-slate-700">Roteiro do TST / Engenheiro</span>
+                                    </div>
+                                    <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+                                </button>
+                                <button onclick="navigateTo('powerpoint')" class="w-full flex items-center justify-between p-3 rounded-lg hover:bg-slate-50 border border-slate-100 transition-colors group">
+                                    <div class="flex items-center gap-3">
+                                        <div class="p-2 bg-slate-100 text-slate-600 rounded-md group-hover:bg-emerald-50 group-hover:text-emerald-600">
+                                            <i data-lucide="presentation" class="w-4 h-4"></i>
+                                        </div>
+                                        <span class="text-sm font-medium text-slate-700">Treinamento em Slides (NR-35)</span>
+                                    </div>
+                                    <i data-lucide="chevron-right" class="w-4 h-4 text-slate-400"></i>
+                                </button>
+                            </div>
+                        </div>
+                        <div class="mt-6 pt-4 border-t border-slate-100">
+                            <div class="flex items-center justify-between text-xs text-slate-500">
+                                <span>Coordenador do Sistema:</span>
+                                <span class="font-bold text-slate-700">João Pedro Caxias</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 2. INTEGRAÇÃO -->
+            <section id="page-integracao" class="page-content space-y-6 hidden">
+                <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm">
+                    <h2 class="text-lg font-bold text-slate-800 mb-1">Módulo de Integração de Segurança</h2>
+                    <p class="text-sm text-slate-500 mb-6">Treinamento obrigatório para recepcionar e capacitar novos colaboradores antes do início das atividades operacionais.</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <!-- Regras de Ouro -->
+                        <div class="border border-slate-200 rounded-xl p-5 bg-slate-50/50">
+                            <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2 mb-3">
+                                <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-600"></i> 5 Regras de Ouro da Empresa
+                            </h3>
+                            <ul class="space-y-2.5 text-xs text-slate-600">
+                                <li class="flex items-start gap-2">
+                                    <span class="font-bold text-emerald-600">1.</span> Uso obrigatório de EPIs homologados conforme o Risco da Área.
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="font-bold text-emerald-600">2.</span> Nunca execute trabalho em altura (NR-35) sem a Permissão de Trabalho (PT).
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="font-bold text-emerald-600">3.</span> Bloqueio e Etiquetagem de Fontes de Energia (LOTO) em manutenções.
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="font-bold text-emerald-600">4.</span> É proibido o uso de telefone celular durante a operação de máquinas.
+                                </li>
+                                <li class="flex items-start gap-2">
+                                    <span class="font-bold text-emerald-600">5.</span> Relate imediatamente qualquer condição ou ato inseguro observado.
+                                </li>
+                            </ul>
+                        </div>
+
+                        <!-- EPIs Obrigatórios por Área -->
+                        <div class="border border-slate-200 rounded-xl p-5 bg-slate-50/50">
+                            <h3 class="font-bold text-slate-800 text-sm flex items-center gap-2 mb-3">
+                                <i data-lucide="hard-hat" class="w-4 h-4 text-emerald-600"></i> Kit Básico de EPI (NR-06)
+                            </h3>
+                            <div class="grid grid-cols-2 gap-3 text-xs text-slate-600">
+                                <div class="p-2 bg-white rounded border border-slate-200 flex items-center gap-2">
+                                    <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600"></i> Capacete com Yugular
+                                </div>
+                                <div class="p-2 bg-white rounded border border-slate-200 flex items-center gap-2">
+                                    <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600"></i> Óculos de Proteção UV
+                                </div>
+                                <div class="p-2 bg-white rounded border border-slate-200 flex items-center gap-2">
+                                    <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600"></i> Protetor Auricular Plug
+                                </div>
+                                <div class="p-2 bg-white rounded border border-slate-200 flex items-center gap-2">
+                                    <i data-lucide="check" class="w-3.5 h-3.5 text-emerald-600"></i> Botina com Biqueira
+                                </div>
+                            </div>
+                            <button onclick="showToast('Termo de Entrega de EPI gerado com sucesso!')" class="mt-4 w-full py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-xs font-semibold transition-colors">Emitir Ficha de EPI</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm">
+                    <h3 class="font-bold text-slate-800 text-sm mb-3">Confirmação de Integração de Funcionário</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <input type="text" placeholder="Nome Completo do Funcionário" class="px-3 py-2 border border-slate-200 rounded-lg text-sm">
+                        <input type="text" placeholder="CPF" class="px-3 py-2 border border-slate-200 rounded-lg text-sm">
+                        <button onclick="showToast('Integração de Segurança confirmada e registrada!')" class="py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-lg text-sm font-medium transition-colors">Registrar Integração</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 3. CONTEÚDOS -->
+            <section id="page-conteudos" class="page-content space-y-6 hidden">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                        <h2 class="text-lg font-bold text-slate-800">Biblioteca de Normas e DDS</h2>
+                        <p class="text-sm text-slate-500">Acervo de Normas Regulamentadoras (NRs) e Diálogos Diários de Segurança.</p>
+                    </div>
+                    <button onclick="openAddContentModal()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center gap-2 self-start">
+                        <i data-lucide="plus" class="w-4 h-4"></i> Novo Conteúdo de SST
+                    </button>
+                </div>
+
+                <div class="bg-white rounded-xl border border-slate-200/80 shadow-sm overflow-hidden">
+                    <div class="p-4 border-b border-slate-100 bg-slate-50/50 flex items-center justify-between">
+                        <span class="text-xs font-semibold text-slate-500 uppercase">Módulos de SST Atualizados</span>
+                        <span class="text-xs text-slate-400">4 Módulos Normativos</span>
+                    </div>
+                    <div class="divide-y divide-slate-100" id="content-list">
+                        <!-- Item 1 -->
+                        <div class="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-50 transition-colors">
+                            <div class="flex items-start gap-4">
+                                <div class="p-3 bg-emerald-50 text-emerald-600 rounded-lg shrink-0">
+                                    <i data-lucide="shield-alert" class="w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-slate-800 text-sm">NR-06: Equipamentos de Proteção Individual (EPI)</h4>
+                                    <p class="text-xs text-slate-500 mt-1">Procedimentos de seleção, higienização, guarda e substituição • Carga: 2h</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3 self-end sm:self-center">
+                                <span class="px-2.5 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-medium">Aprovado</span>
+                                <button class="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Item 2 -->
+                        <div class="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-50 transition-colors">
+                            <div class="flex items-start gap-4">
+                                <div class="p-3 bg-blue-50 text-blue-600 rounded-lg shrink-0">
+                                    <i data-lucide="zap" class="w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-slate-800 text-sm">NR-10: Segurança em Instalações e Serviços em Eletricidade</h4>
+                                    <p class="text-xs text-slate-500 mt-1">Medidas de controle, zona de risco e procedimentos de trabalho desenergizado • Carga: 8h</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3 self-end sm:self-center">
+                                <span class="px-2.5 py-1 bg-emerald-100 text-emerald-700 rounded-full text-xs font-medium">Aprovado</span>
+                                <button class="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                            </div>
+                        </div>
+
+                        <!-- Item 3 -->
+                        <div class="p-4 sm:p-5 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-slate-50 transition-colors">
+                            <div class="flex items-start gap-4">
+                                <div class="p-3 bg-amber-50 text-amber-600 rounded-lg shrink-0">
+                                    <i data-lucide="mountain" class="w-5 h-5"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-semibold text-slate-800 text-sm">NR-35: Trabalho em Altura</h4>
+                                    <p class="text-xs text-slate-500 mt-1">Análise de Risco (AR), Ancoragem, Cinto tipo Paraquedista e Resgate • Carga: 4h</p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-3 self-end sm:self-center">
+                                <span class="px-2.5 py-1 bg-amber-100 text-amber-700 rounded-full text-xs font-medium">Revisão Pendente</span>
+                                <button class="p-2 text-slate-400 hover:text-slate-600 rounded-lg hover:bg-slate-100"><i data-lucide="edit-3" class="w-4 h-4"></i></button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 4. ROTEIRO DO INSTRUTOR -->
+            <section id="page-roteiro" class="page-content space-y-6 hidden">
+                <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm">
+                    <h2 class="text-lg font-bold text-slate-800 mb-1">Roteiro do Técnico / Engenheiro de Segurança</h2>
+                    <p class="text-sm text-slate-500 mb-6">Passo a passo para a realização de Diálogos Diários de Segurança (DDS) e treinamentos de campo.</p>
+
+                    <div class="space-y-6">
+                        <!-- Etapa 1 -->
+                        <div class="relative pl-6 border-l-2 border-emerald-500">
+                            <span class="absolute -left-2.5 top-0 w-5 h-5 rounded-full bg-emerald-600 text-white text-xs flex items-center justify-center font-bold">1</span>
+                            <h3 class="font-bold text-slate-800 text-base">Alinhamento e Inspeção Inicial de Campo (15 min)</h3>
+                            <p class="text-sm text-slate-600 mt-1">Reunir a equipe operacional, realizar a verificação do uso correto de EPIs e verificar as condições meteorológicas/ambientais do local.</p>
+                            <div class="mt-3 p-3 bg-slate-50 rounded-lg border border-slate-200 text-xs text-slate-500">
+                                💡 <strong>Instrução do Coordenador João Pedro Caxias:</strong> Não autorize trabalhos em altura ou espaço confinado com chuva ou ventos acima de 30 km/h.
+                            </div>
+                        </div>
+
+                        <!-- Etapa 2 -->
+                        <div class="relative pl-6 border-l-2 border-slate-200">
+                            <span class="absolute -left-2.5 top-0 w-5 h-5 rounded-full bg-slate-300 text-slate-700 text-xs flex items-center justify-center font-bold">2</span>
+                            <h3 class="font-bold text-slate-800 text-base">Aplicação do DDS (Diálogo Diário de Segurança) (10 min)</h3>
+                            <p class="text-sm text-slate-600 mt-1">Abordar o tema do dia (ex: Prevenção de Quedas, Organização do Posto de Trabalho e Riscos Ergonômicos). Coletar assinaturas na lista de presença.</p>
+                        </div>
+
+                        <!-- Etapa 3 -->
+                        <div class="relative pl-6 border-l-2 border-slate-200">
+                            <span class="absolute -left-2.5 top-0 w-5 h-5 rounded-full bg-slate-300 text-slate-700 text-xs flex items-center justify-center font-bold">3</span>
+                            <h3 class="font-bold text-slate-800 text-base">Emissão e Liberação da Permissão de Trabalho (PT) (20 min)</h3>
+                            <p class="text-sm text-slate-600 mt-1">Preenchimento conjunto da Análise Preliminar de Risco (APR) e emissão da PT com a assinatura dos responsáveis pelo setor.</p>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 5. LISTA DE VERIFICAÇÃO -->
+            <section id="page-checklist" class="page-content space-y-6 hidden">
+                <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-800">Checklist de Inspeção de Segurança / CIPA</h2>
+                            <p class="text-sm text-slate-500">Inspeção periódica de rotina. Dados salvos localmente no seu navegador.</p>
+                        </div>
+                        <div class="text-right">
+                            <span id="checklist-progress-text" class="text-xs font-semibold text-emerald-600">0% concluído</span>
+                            <div class="w-32 h-2 bg-slate-100 rounded-full mt-1 overflow-hidden">
+                                <div id="checklist-progress-bar" class="h-full bg-emerald-600 transition-all duration-300 w-0"></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Input para Nova Tarefa -->
+                    <form onsubmit="addChecklistItem(event)" class="flex gap-2 mb-6">
+                        <input type="text" id="new-task-input" placeholder="Adicionar nova verificação de segurança..." required class="flex-1 px-4 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-emerald-500/20 focus:border-emerald-500">
+                        <button type="submit" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg text-sm font-medium transition-colors">Adicionar</button>
+                    </form>
+
+                    <!-- Lista Dinâmica -->
+                    <div id="checklist-items" class="space-y-2">
+                        <!-- Itens renderizados via JS -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- 6. SOBRE O PROJETO -->
+            <section id="page-sobre" class="page-content space-y-6 hidden">
+                <div class="bg-white p-6 md:p-8 rounded-xl border border-slate-200/80 shadow-sm">
+                    <div class="max-w-3xl space-y-6">
+                        <div>
+                            <span class="px-3 py-1 bg-emerald-50 text-emerald-700 rounded-full text-xs font-bold uppercase">Gestão SST v3.1</span>
+                            <h2 class="text-2xl font-bold text-slate-800 mt-2">Plataforma SafeWork SST</h2>
+                            <p class="text-slate-600 text-sm leading-relaxed mt-2">
+                                Este sistema tem como missão promover a cultura de acidente zero nas operações industriais e corporativas. Oferece controle completo sobre validações de EPIs, treinamentos normativos, auditorias da CIPA e rotinas de prevenção com processamento 100% no cliente.
+                            </p>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 py-4 border-y border-slate-100">
+                            <div>
+                                <h4 class="font-semibold text-slate-800 text-sm">Coordenador Geral de SST</h4>
+                                <p class="text-sm font-bold text-emerald-700 mt-1">João Pedro Caxias</p>
+                                <p class="text-xs text-slate-500">Engenheiro de Segurança do Trabalho / Responsável Técnico</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-slate-800 text-sm">Objetivo Operacional</h4>
+                                <p class="text-xs text-slate-500 mt-1">Zero Acidentes com Afastamento, conformidade legal e saúde ocupacional contínua.</p>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 class="font-semibold text-slate-800 text-sm mb-2">Equipe Técnica de Segurança</h4>
+                            <div class="flex items-center gap-3">
+                                <div class="w-9 h-9 rounded-full bg-emerald-700 text-white flex items-center justify-center font-bold text-xs">JPC</div>
+                                <div>
+                                    <p class="text-sm font-semibold text-slate-700">João Pedro Caxias & Equipe Especializada SST</p>
+                                    <p class="text-xs text-slate-400">contato.sst@safework.com.br</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 7. POWERPOINT -->
+            <section id="page-powerpoint" class="page-content space-y-6 hidden">
+                <div class="bg-white p-6 rounded-xl border border-slate-200/80 shadow-sm">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                        <div>
+                            <h2 class="text-lg font-bold text-slate-800">Apresentação Interativa - NR-35 (Trabalho em Altura)</h2>
+                            <p class="text-sm text-slate-500">Slides orientativos para aplicação em treinamentos de integração e reciclagem.</p>
+                        </div>
+                        <button onclick="simulateDownload()" class="px-4 py-2 border border-slate-200 hover:bg-slate-50 text-slate-700 rounded-lg text-sm font-medium transition-colors flex items-center gap-2 self-start">
+                            <i data-lucide="download" class="w-4 h-4"></i> Baixar .PPTX
+                        </button>
+                    </div>
+
+                    <!-- Simulação do Slide -->
+                    <div class="bg-slate-900 rounded-xl p-8 md:p-12 text-white min-h-[320px] flex flex-col justify-between shadow-inner relative overflow-hidden">
+                        <div class="flex justify-between items-center text-xs text-slate-400">
+                            <span>Treinamento Técnico SST - Coord. João Pedro Caxias</span>
+                            <span id="slide-number">Slide 1 de 3</span>
+                        </div>
+
+                        <!-- Conteúdo Dinâmico do Slide -->
+                        <div id="slide-content" class="my-8 text-center transition-opacity duration-200">
+                            <!-- Injetado por JS -->
+                        </div>
+
+                        <!-- Controles de Slide -->
+                        <div class="flex justify-between items-center pt-4 border-t border-slate-800">
+                            <button onclick="prevSlide()" class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-xs font-semibold rounded-md transition-colors flex items-center gap-1">
+                                <i data-lucide="chevron-left" class="w-4 h-4"></i> Anterior
+                            </button>
+                            <div class="flex gap-1.5" id="slide-dots">
+                                <!-- Dots injetados por JS -->
+                            </div>
+                            <button onclick="nextSlide()" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-xs font-semibold rounded-md transition-colors flex items-center gap-1">
+                                Próximo <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- NOTIFICAÇÃO TOAST -->
+    <div id="toast" class="fixed bottom-5 right-5 bg-slate-800 text-white px-4 py-3 rounded-xl shadow-lg transform translate-y-20 opacity-0 transition-all duration-300 z-50 flex items-center gap-3">
+        <i data-lucide="shield-check" class="w-5 h-5 text-emerald-400"></i>
+        <span id="toast-message" class="text-sm font-medium">Ação realizada com sucesso!</span>
+    </div>
+
+    <!-- SCRIPT DE NAVEGAÇÃO E LÓGICA LOCAL -->
+    <script>
+        // Data Store / Estado da Aplicação focado em SST
+        const state = {
+            currentPage: 'visao-geral',
+            slides: [
+                { title: 'NR-35: Trabalho em Altura', text: 'Considera-se trabalho em altura toda atividade executada acima de 2,00m (dois metros) do nível inferior, onde haja risco de queda.' },
+                { title: 'Equipamentos Obrigatórios (EPI / EPC)', text: '1. Cinto de Segurança Tipo Paraquedista com Talabarte Duplo.\n2. Linha de Vida e Ancoragem Certificada.\n3. Capacete de Proteção com Jugular ajustada.' },
+                { title: 'Permissão de Trabalho (PT)', text: 'Nenhuma atividade em altura pode ser iniciada sem a liberação da Análise Preliminar de Risco (APR) e autorização assinada pelo responsável de SST.' }
+            ],
+            currentSlideIndex: 0,
+            checklist: JSON.parse(localStorage.getItem('sst_checklist')) || [
+                { id: 1, text: 'Testar e inspecionar extintores de incêndio da área', done: true },
+                { id: 2, text: 'Verificar se os colaboradores em altura usam cinto paraquedista', done: true },
+                { id: 3, text: 'Checar validade dos CA (Certificados de Aprovação) dos EPIs', done: false },
+                { id: 4, text: 'Inspecionar sinalização de isolamento da área de carga', done: false },
+                { id: 5, text: 'Realizar medição de gases em Espaço Confinado (NR-33)', done: false }
+            ]
+        };
+
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            lucide.createIcons();
+            initChart();
+            renderChecklist();
+            renderSlide();
+            
+            // Ativar página inicial
+            navigateTo(state.currentPage);
+        });
+
+        // Alternar Menu Mobile
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const backdrop = document.getElementById('sidebar-backdrop');
+            sidebar.classList.toggle('-translate-x-full');
+            backdrop.classList.toggle('hidden');
+        }
+
+        // Navegação de Páginas (SPA)
+        function navigateTo(pageId) {
+            state.currentPage = pageId;
+
+            // Ocultar todas as páginas
+            document.querySelectorAll('.page-content').forEach(el => el.classList.add('hidden'));
+            
+            // Exibir a página selecionada
+            const targetPage = document.getElementById(`page-${pageId}`);
+            if (targetPage) targetPage.classList.remove('hidden');
+
+            // Atualizar títulos do Header
+            const titles = {
+                'visao-geral': 'Visão geral',
+                'integracao': 'Integração',
+                'conteudos': 'Conteúdos',
+                'roteiro': 'Roteiro do instrutor',
+                'checklist': 'Lista de verificação',
+                'sobre': 'Sobre o projeto',
+                'powerpoint': 'PowerPoint'
+            };
+            document.getElementById('page-title').innerText = titles[pageId] || 'Painel SST';
+
+            // Estilizar Botões Ativos da Sidebar
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                if (btn.dataset.page === pageId) {
+                    btn.className = "nav-btn w-full flex items-center gap-3.5 px-4 py-3 text-sm font-semibold rounded-xl bg-emerald-600 text-white shadow-md transition-all duration-150";
+                } else {
+                    btn.className = "nav-btn w-full flex items-center gap-3.5 px-4 py-3 text-sm font-medium rounded-xl text-slate-300 hover:bg-slate-800 hover:text-white transition-all duration-150";
+                }
+            });
+
+            // Se for mobile, fechar menu ao clicar
+            if (window.innerWidth < 768) {
+                const sidebar = document.getElementById('sidebar');
+                const backdrop = document.getElementById('sidebar-backdrop');
+                if (!sidebar.classList.contains('-translate-x-full')) {
+                    sidebar.classList.add('-translate-x-full');
+                    backdrop.classList.add('hidden');
+                }
+            }
+        }
+
+        // Gráfico de Indicadores de SST (Chart.js)
+        function initChart() {
+            const ctx = document.getElementById('engagementChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+                    datasets: [
+                        {
+                            label: 'Quase-Acidentes Relatados',
+                            data: [12, 19, 8, 15, 6, 4],
+                            backgroundColor: 'rgba(234, 179, 8, 0.75)',
+                            borderRadius: 6
+                        },
+                        {
+                            label: 'Inspeções de Segurança Concluídas',
+                            data: [25, 30, 28, 35, 40, 42],
+                            backgroundColor: 'rgba(22, 163, 74, 0.85)',
+                            borderRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { position: 'top', labels: { font: { family: 'Inter', size: 11 } } } },
+                    scales: {
+                        y: { grid: { color: '#f1f5f9' }, ticks: { font: { family: 'Inter' } } },
+                        x: { grid: { display: false }, ticks: { font: { family: 'Inter' } } }
+                    }
+                }
+            });
+        }
+
+        // Lógica da Lista de Verificação (Checklist SST)
+        function renderChecklist() {
+            const container = document.getElementById('checklist-items');
+            container.innerHTML = '';
+
+            let doneCount = 0;
+            state.checklist.forEach(item => {
+                if (item.done) doneCount++;
+
+                const div = document.createElement('div');
+                div.className = `p-3 rounded-lg border transition-all flex items-center justify-between ${item.done ? 'bg-slate-50 border-slate-200 text-slate-400 line-through' : 'bg-white border-slate-200 text-slate-700'}`;
+                div.innerHTML = `
+                    <label class="flex items-center gap-3 cursor-pointer flex-1">
+                        <input type="checkbox" ${item.done ? 'checked' : ''} onchange="toggleTask(${item.id})" class="w-4 h-4 rounded text-emerald-600 focus:ring-emerald-500">
+                        <span class="text-sm font-medium">${item.text}</span>
+                    </label>
+                    <button onclick="removeTask(${item.id})" class="text-slate-300 hover:text-red-500 p-1 rounded"><i data-lucide="trash-2" class="w-4 h-4"></i></button>
+                `;
+                container.appendChild(div);
+            });
+
+            // Atualizar Progresso
+            const total = state.checklist.length;
+            const percent = total === 0 ? 0 : Math.round((doneCount / total) * 100);
+            document.getElementById('checklist-progress-bar').style.width = `${percent}%`;
+            document.getElementById('checklist-progress-text').innerText = `${percent}% concluído`;
+            document.getElementById('dash-pending-tasks').innerText = `${doneCount}/${total}`;
+
+            // Salvar no localStorage
+            localStorage.setItem('sst_checklist', JSON.stringify(state.checklist));
+            lucide.createIcons();
+        }
+
+        function toggleTask(id) {
+            state.checklist = state.checklist.map(t => t.id === id ? { ...t, done: !t.done } : t);
+            renderChecklist();
+        }
+
+        function addChecklistItem(e) {
+            e.preventDefault();
+            const input = document.getElementById('new-task-input');
+            if (!input.value.trim()) return;
+
+            state.checklist.push({
+                id: Date.now(),
+                text: input.value.trim(),
+                done: false
+            });
+            input.value = '';
+            renderChecklist();
+            showToast('Item de inspeção adicionado com sucesso!');
+        }
+
+        function removeTask(id) {
+            state.checklist = state.checklist.filter(t => t.id !== id);
+            renderChecklist();
+            showToast('Item removido da lista!');
+        }
+
+        // Lógica do PowerPoint Slide Viewer
+        function renderSlide() {
+            const slide = state.slides[state.currentSlideIndex];
+            const contentDiv = document.getElementById('slide-content');
+            
+            contentDiv.style.opacity = 0;
+            setTimeout(() => {
+                contentDiv.innerHTML = `
+                    <h3 class="text-2xl font-bold text-white mb-3">${slide.title}</h3>
+                    <p class="text-slate-300 text-sm whitespace-pre-line max-w-lg mx-auto">${slide.text}</p>
+                `;
+                contentDiv.style.opacity = 1;
+            }, 150);
+
+            document.getElementById('slide-number').innerText = `Slide ${state.currentSlideIndex + 1} de ${state.slides.length}`;
+
+            // Render Dots
+            const dotsContainer = document.getElementById('slide-dots');
+            dotsContainer.innerHTML = '';
+            state.slides.forEach((_, idx) => {
+                const dot = document.createElement('span');
+                dot.className = `w-2 h-2 rounded-full transition-all ${idx === state.currentSlideIndex ? 'bg-emerald-500 w-4' : 'bg-slate-700'}`;
+                dotsContainer.appendChild(dot);
+            });
+        }
+
+        function nextSlide() {
+            if (state.currentSlideIndex < state.slides.length - 1) {
+                state.currentSlideIndex++;
+                renderSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (state.currentSlideIndex > 0) {
+                state.currentSlideIndex--;
+                renderSlide();
+            }
+        }
+
+        // Funções Utilitárias
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            document.getElementById('toast-message').innerText = msg;
+            toast.classList.remove('translate-y-20', 'opacity-0');
+            setTimeout(() => {
+                toast.classList.add('translate-y-20', 'opacity-0');
+            }, 3000);
+        }
+
+        function simulateDownload() {
+            showToast('Download do treinamento (.PPTX) de Segurança iniciado!');
+        }
+
+        function openAddContentModal() {
+            showToast('Formulário de cadastro de Normas/DDS ativado.');
+        }
+    </script>
+</body>
+</html>
