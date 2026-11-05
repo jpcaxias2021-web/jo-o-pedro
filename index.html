@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="pt-PT">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>SafeWork SST - Gestão de Segurança do Trabalho</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    
+    /* Transitions for slides */
+    .slide-card {
+      transition: all 0.3s ease-in-out;
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #4B5563;
+      border-radius: 4px;
+    }
+  </style>
+</head>
+<body class="bg-gray-100 text-gray-800 flex h-screen overflow-hidden">
+
+  <!-- Sidebar Lateral -->
+  <aside class="w-64 bg-slate-900 text-slate-200 flex flex-col justify-between shadow-xl flex-shrink-0">
+    <div>
+      <!-- Header da Marca -->
+      <div class="p-5 flex items-center gap-3 border-b border-slate-800">
+        <div class="bg-emerald-500 text-slate-950 p-2.5 rounded-lg flex items-center justify-center font-bold">
+          <i class="fa-solid fa-hard-hat text-xl"></i>
+        </div>
+        <div>
+          <h1 class="font-bold text-white text-base leading-tight">SafeWork SST</h1>
+          <p class="text-xs text-slate-400">Plataforma de Segurança</p>
+        </div>
+      </div>
+
+      <!-- Menu de Navegação Interativo -->
+      <nav class="mt-4 px-3 space-y-1">
+        <button onclick="navigate('overview')" id="nav-overview" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors bg-emerald-600 text-white">
+          <i class="fa-solid fa-house w-5 text-center"></i> Visão geral
+        </button>
+        <button onclick="navigate('integration')" id="nav-integration" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">
+          <i class="fa-solid fa-[#0] fa-cube w-5 text-center"></i> Integração
+        </button>
+        <button onclick="navigate('contents')" id="nav-contents" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">
+          <i class="fa-solid fa-[#0] fa-book-open w-5 text-center"></i> Conteúdos
+        </button>
+        <button onclick="navigate('instructor')" id="nav-instructor" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">
+          <i class="fa-solid fa-clipboard-user w-5 text-center"></i> Roteiro do instrutor
+        </button>
+        <button onclick="navigate('checklist')" id="nav-checklist" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">
+          <i class="fa-solid fa-list-check w-5 text-center"></i> Lista de verificação
+        </button>
+        <button onclick="navigate('about')" id="nav-about" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">
+          <i class="fa-solid fa-circle-info w-5 text-center"></i> Sobre o projeto
+        </button>
+        <button onclick="navigate('powerpoint')" id="nav-powerpoint" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition-colors">
+          <i class="fa-solid fa-file-powerpoint w-5 text-center"></i> PowerPoint
+        </button>
+      </nav>
+    </div>
+
+    <!-- Perfil Coordenador -->
+    <div class="p-4 border-t border-slate-800 bg-slate-950/50 flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center text-sm shadow">
+        JP
+      </div>
+      <div class="overflow-hidden">
+        <p class="text-xs font-semibold text-white truncate">João Pedro Caxias</p>
+        <p class="text-[11px] text-emerald-400 truncate">Coordenador Geral SST</p>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Área do Conteúdo Principal -->
+  <main class="flex-1 flex flex-col overflow-y-auto bg-slate-50">
+    
+    <!-- Topbar -->
+    <header class="bg-white border-b border-gray-200 px-8 py-4 flex justify-between items-center sticky top-0 z-10">
+      <div>
+        <h2 id="page-title" class="text-xl font-bold text-gray-800">Visão Geral do Sistema</h2>
+        <p id="page-subtitle" class="text-xs text-gray-500">Painel Principal de Controlo de Segurança no Trabalho</p>
+      </div>
+      <div class="flex items-center gap-4">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span> Sistema Ativo
+        </span>
+        <div class="text-right border-l pl-4 border-gray-200">
+          <p class="text-xs font-bold text-gray-700">João Pedro Caxias</p>
+          <p class="text-[10px] text-gray-500">Engº de Segurança do Trabalho</p>
+        </div>
+      </div>
+    </header>
+
+    <!-- Conteúdo Dinâmico das Páginas -->
+    <div class="p-8 flex-1">
+      
+      <!-- PÁGINA 1: VISÃO GERAL (INDEX) -->
+      <section id="page-overview" class="space-y-6">
+        <!-- Banner Boas-vindas -->
+        <div class="bg-gradient-to-r from-slate-900 to-slate-800 text-white p-6 rounded-2xl shadow-sm flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-l-4 border-emerald-500">
+          <div>
+            <h3 class="text-xl font-bold">Bem-vindo à Plataforma SafeWork SST</h3>
+            <p class="text-slate-300 text-sm mt-1">Coordenador responsável: <strong class="text-emerald-400">João Pedro Caxias</strong>. Todos os módulos operacionais estão centralizados neste índice.</p>
+          </div>
+          <button onclick="navigate('powerpoint')" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-4 py-2 rounded-lg text-sm transition-all shadow hover:shadow-emerald-500/20 whitespace-nowrap">
+            <i class="fa-solid fa-play mr-2"></i> Abrir Apresentação SST
+          </button>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+          <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+            <div class="flex justify-between items-center text-gray-500">
+              <span class="text-xs font-bold uppercase">Dias sem Acidentes</span>
+              <i class="fa-solid fa-shield-halved text-emerald-500 text-lg"></i>
+            </div>
+            <p class="text-3xl font-extrabold text-gray-800 mt-2">142</p>
+            <span class="text-xs text-emerald-600 font-medium">Meta: 365 Dias</span>
+          </div>
+
+          <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+            <div class="flex justify-between items-center text-gray-500">
+              <span class="text-xs font-bold uppercase">Formações Concluídas</span>
+              <i class="fa-solid fa-user-graduate text-blue-500 text-lg"></i>
+            </div>
+            <p class="text-3xl font-extrabold text-gray-800 mt-2">89%</p>
+            <span class="text-xs text-blue-600 font-medium">+5% em relação ao mês anterior</span>
+          </div>
+
+          <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+            <div class="flex justify-between items-center text-gray-500">
+              <span class="text-xs font-bold uppercase">Inspeções Pendentes</span>
+              <i class="fa-solid fa-triangle-exclamation text-amber-500 text-lg"></i>
+            </div>
+            <p class="text-3xl font-extrabold text-gray-800 mt-2">3</p>
+            <span class="text-xs text-amber-600 font-medium">Prioridade Média</span>
+          </div>
+
+          <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+            <div class="flex justify-between items-center text-gray-500">
+              <span class="text-xs font-bold uppercase">EPIs Conformes</span>
+              <i class="fa-solid fa-check-double text-indigo-500 text-lg"></i>
+            </div>
+            <p class="text-3xl font-extrabold text-gray-800 mt-2">98.4%</p>
+            <span class="text-xs text-indigo-600 font-medium">Auditoria em dia</span>
+          </div>
+        </div>
+
+        <!-- Gráfico e Índice de Navegação -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div class="lg:col-span-2 bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+            <h4 class="font-bold text-gray-800 mb-4 flex items-center gap-2">
+              <i class="fa-solid fa-chart-column text-emerald-600"></i> Ocorrências vs Treinamentos de SST (Ano Corrente)
+            </h4>
+            <div class="h-64">
+              <canvas id="sstChart"></canvas>
+            </div>
+          </div>
+
+          <!-- Atalhos Rápidos da Plataforma -->
+          <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm flex flex-col justify-between">
+            <div>
+              <h4 class="font-bold text-gray-800 mb-3 border-b pb-2">Índice Geral do Sistema</h4>
+              <ul class="space-y-2 text-sm">
+                <li>
+                  <button onclick="navigate('integration')" class="w-full text-left p-2 rounded hover:bg-slate-100 flex items-center justify-between text-gray-700">
+                    <span><i class="fa-solid fa-cube text-emerald-600 mr-2"></i> Integração de Novo Colaborador</span>
+                    <i class="fa-solid fa-chevron-right text-xs text-gray-400"></i>
+                  </button>
+                </li>
+                <li>
+                  <button onclick="navigate('contents')" class="w-full text-left p-2 rounded hover:bg-slate-100 flex items-center justify-between text-gray-700">
+                    <span><i class="fa-solid fa-book-open text-emerald-600 mr-2"></i> Módulos & Conteúdos</span>
+                    <i class="fa-solid fa-chevron-right text-xs text-gray-400"></i>
+                  </button>
+                </li>
+                <li>
+                  <button onclick="navigate('instructor')" class="w-full text-left p-2 rounded hover:bg-slate-100 flex items-center justify-between text-gray-700">
+                    <span><i class="fa-solid fa-clipboard-user text-emerald-600 mr-2"></i> Roteiro do Instrutor SST</span>
+                    <i class="fa-solid fa-chevron-right text-xs text-gray-400"></i>
+                  </button>
+                </li>
+                <li>
+                  <button onclick="navigate('checklist')" class="w-full text-left p-2 rounded hover:bg-slate-100 flex items-center justify-between text-gray-700">
+                    <span><i class="fa-solid fa-list-check text-emerald-600 mr-2"></i> Lista de Verificação Diária</span>
+                    <i class="fa-solid fa-chevron-right text-xs text-gray-400"></i>
+                  </button>
+                </li>
+                <li>
+                  <button onclick="navigate('powerpoint')" class="w-full text-left p-2 rounded hover:bg-slate-100 flex items-center justify-between text-gray-700">
+                    <span><i class="fa-solid fa-file-powerpoint text-emerald-600 mr-2"></i> Slides da Formação</span>
+                    <i class="fa-solid fa-chevron-right text-xs text-gray-400"></i>
+                  </button>
+                </li>
+              </ul>
+            </div>
+            <div class="mt-4 pt-3 border-t text-xs text-gray-500 text-center">
+              Gestão Sob Responsabilidade do Eng. João Pedro Caxias
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PÁGINA 2: INTEGRAÇÃO -->
+      <section id="page-integration" class="hidden space-y-6">
+        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+          <h3 class="text-lg font-bold text-gray-800 mb-2">Formulário de Integração de Segurança</h3>
+          <p class="text-sm text-gray-600 mb-6">Registo obrigatório para novos colaboradores antes do início de atividades operacionais.</p>
+          
+          <form onsubmit="event.preventDefault(); alert('Registo de Integração efetuado com sucesso!');" class="space-y-4 max-w-2xl">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Nome Completo</label>
+                <input type="text" placeholder="Nome do Funcionário" class="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none" required>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Função / Cargo</label>
+                <input type="text" placeholder="Ex: Operador de Máquinas" class="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none" required>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Setor / Departamento</label>
+                <select class="w-full p-2.5 border rounded-lg text-sm focus:ring-2 focus:ring-emerald-500 outline-none">
+                  <option>Produção / Manutenção</option>
+                  <option>Logística / Armazém</option>
+                  <option>Construção Civil</option>
+                  <option>Administrativo</option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-xs font-bold text-gray-700 uppercase mb-1">Coordenador Responsável</label>
+                <input type="text" value="João Pedro Caxias" disabled class="w-full p-2.5 border rounded-lg text-sm bg-gray-100 text-gray-600">
+              </div>
+            </div>
+            <div class="p-4 bg-emerald-50 border border-emerald-200 rounded-lg">
+              <label class="flex items-center gap-2 cursor-pointer">
+                <input type="checkbox" required class="rounded text-emerald-600 focus:ring-emerald-500 h-4 w-4">
+                <span class="text-xs text-emerald-900 font-medium">Declaro ter recebido os EPIs necessários e assistido ao treinamento de Integração de SST.</span>
+              </label>
+            </div>
+            <button type="submit" class="bg-emerald-600 hover:bg-emerald-700 text-white font-bold px-6 py-2.5 rounded-lg text-sm transition-all shadow">
+              Concluir Integração
+            </button>
+          </form>
+        </div>
+      </section>
+
+      <!-- PÁGINA 3: CONTEÚDOS -->
+      <section id="page-contents" class="hidden space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+            <span class="text-xs font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded">Módulo 01</span>
+            <h4 class="font-bold text-gray-800 text-base mt-2">Normas Regulamentadoras (NRs)</h4>
+            <p class="text-xs text-gray-600 mt-2">Revisão detalhada da NR-06 (EPIs), NR-10 (Eletricidade) e NR-35 (Trabalho em Altura).</p>
+            <div class="mt-4 pt-3 border-t flex justify-between items-center text-xs text-gray-500">
+              <span>Carga Horária: 4h</span>
+              <span class="text-emerald-600 font-bold">Obrigatório</span>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+            <span class="text-xs font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded">Módulo 02</span>
+            <h4 class="font-bold text-gray-800 text-base mt-2">Prevenção de Incêndios</h4>
+            <p class="text-xs text-gray-600 mt-2">Manuseio de extintores, rotas de evacuação, sinalização de emergência e primeiros socorros.</p>
+            <div class="mt-4 pt-3 border-t flex justify-between items-center text-xs text-gray-500">
+              <span>Carga Horária: 2h</span>
+              <span class="text-blue-600 font-bold">Prático</span>
+            </div>
+          </div>
+
+          <div class="bg-white rounded-xl border border-gray-200 p-5 shadow-sm">
+            <span class="text-xs font-bold text-amber-600 bg-amber-50 px-2 py-1 rounded">Módulo 03</span>
+            <h4 class="font-bold text-gray-800 text-base mt-2">Análise Preliminar de Risco (APR)</h4>
+            <p class="text-xs text-gray-600 mt-2">Metodologia para identificação prévia de perigos antes do início de qualquer tarefa técnica.</p>
+            <div class="mt-4 pt-3 border-t flex justify-between items-center text-xs text-gray-500">
+              <span>Carga Horária: 3h</span>
+              <span class="text-amber-600 font-bold">Técnico</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PÁGINA 4: ROTEIRO DO INSTRUTOR -->
+      <section id="page-instructor" class="hidden space-y-6">
+        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+          <div class="flex justify-between items-center border-b pb-4 mb-4">
+            <div>
+              <h3 class="text-lg font-bold text-gray-800">Guia Didático do Formador</h3>
+              <p class="text-xs text-gray-500">Supervisão pedagógica: Eng. João Pedro Caxias</p>
+            </div>
+            <span class="bg-slate-100 text-slate-800 text-xs font-bold px-3 py-1 rounded-full">Versão 2026.1</span>
+          </div>
+
+          <div class="space-y-4">
+            <div class="p-4 border-l-4 border-emerald-500 bg-slate-50 rounded-r-lg">
+              <h5 class="font-bold text-gray-800 text-sm">Passo 1: Introdução e Acolhimento (15 min)</h5>
+              <p class="text-xs text-gray-600 mt-1">Apresentar as diretrizes gerais da empresa, visão do coordenador João Pedro Caxias e regras de segurança da sala.</p>
+            </div>
+            <div class="p-4 border-l-4 border-emerald-500 bg-slate-50 rounded-r-lg">
+              <h5 class="font-bold text-gray-800 text-sm">Passo 2: Apresentação de Conceitos Principais (45 min)</h5>
+              <p class="text-xs text-gray-600 mt-1">Exibir os slides do módulo PowerPoint (Disponível na aba "PowerPoint") abordando NR-35 e Permissão de Trabalho (PT).</p>
+            </div>
+            <div class="p-4 border-l-4 border-emerald-500 bg-slate-50 rounded-r-lg">
+              <h5 class="font-bold text-gray-800 text-sm">Passo 3: Demonstração Prática de EPIs (30 min)</h5>
+              <p class="text-xs text-gray-600 mt-1">Demonstrar ajuste correto de cinto paraquedista, capacete de proteção e inspecionar prazos de validade dos equipamentos.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PÁGINA 5: LISTA DE VERIFICAÇÃO -->
+      <section id="page-checklist" class="hidden space-y-6">
+        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-bold text-gray-800">Checklist Diário de Segurança no Campo</h3>
+            <span class="text-xs bg-emerald-100 text-emerald-800 font-bold px-2.5 py-1 rounded">Processamento Local</span>
+          </div>
+          
+          <div class="space-y-3" id="checklist-container">
+            <!-- Renderizado via JavaScript com suporte ao LocalStorage -->
+          </div>
+        </div>
+      </section>
+
+      <!-- PÁGINA 6: SOBRE O PROJETO -->
+      <section id="page-about" class="hidden space-y-6">
+        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+          <h3 class="text-xl font-bold text-gray-800 mb-2">Sobre o Projeto SafeWork SST</h3>
+          <p class="text-sm text-gray-600 mb-4 leading-relaxed">
+            A plataforma SafeWork SST é uma solução web focada na centralização de treinamentos, gestão de normas regulamentadoras e conformidade operacional de Segurança do Trabalho.
+          </p>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 border-t pt-4 mt-4">
+            <div>
+              <p class="text-xs text-gray-400 font-bold uppercase">Coordenador Geral do Projeto</p>
+              <p class="text-base font-bold text-gray-800">João Pedro Caxias</p>
+              <p class="text-xs text-emerald-600">Engenheiro de Segurança do Trabalho</p>
+            </div>
+            <div>
+              <p class="text-xs text-gray-400 font-bold uppercase">Tecnologia</p>
+              <p class="text-base font-bold text-gray-800">HTML5 / JavaScript SPA Local</p>
+              <p class="text-xs text-gray-500">Sem dependência de servidores externos</p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- PÁGINA 7: POWERPOINT (SLIDES ELABORADOS) -->
+      <section id="page-powerpoint" class="hidden space-y-6">
+        <div class="bg-slate-900 rounded-2xl p-6 shadow-2xl text-white">
+          
+          <!-- Controlo do Slide / Header da Apresentação -->
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center border-b border-slate-800 pb-4 mb-6 gap-3">
+            <div class="flex items-center gap-3">
+              <span class="bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded uppercase tracking-wider">PPTX Presentation</span>
+              <h3 class="font-bold text-slate-100 text-base" id="slide-title-header">Formação Abrangente em SST</h3>
+            </div>
+            <div class="flex items-center gap-3">
+              <span class="text-xs text-slate-400">Slide <strong class="text-emerald-400" id="current-slide-num">1</strong> de <span id="total-slides-num">5</span></span>
+              <div class="flex gap-1">
+                <button onclick="prevSlide()" class="p-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg transition"><i class="fa-solid fa-chevron-left"></i></button>
+                <button onclick="nextSlide()" class="p-2 bg-slate-800 hover:bg-slate-700 text-white rounded-lg transition"><i class="fa-solid fa-chevron-right"></i></button>
+              </div>
+            </div>
+          </div>
+
+          <!-- ÁREA DO SLIDE INTERATIVO -->
+          <div class="min-h-[420px] bg-slate-950 border border-slate-800 rounded-xl p-8 relative flex flex-col justify-between shadow-inner" id="slide-canvas">
+            
+            <!-- Conteúdo Dinâmico do Slide será inserido aqui via JS -->
+            <div id="slide-content-body" class="w-full"></div>
+
+            <!-- Rodapé Fixo do Slide -->
+            <div class="border-t border-slate-800/80 pt-4 mt-6 flex justify-between items-center text-xs text-slate-500">
+              <div class="flex items-center gap-2">
+                <i class="fa-solid fa-shield-halved text-emerald-500"></i>
+                <span>SafeWork SST | Diretrizes Operacionais</span>
+              </div>
+              <div>
+                Coordenador: <strong class="text-slate-300">João Pedro Caxias</strong>
+              </div>
+            </div>
+          </div>
+
+          <!-- Paginadores em Dots -->
+          <div class="flex justify-center gap-2 mt-4" id="slide-dots">
+            <!-- Gerado Dinamicamente -->
+          </div>
+
+        </div>
+      </section>
+
+    </div>
+  </main>
+
+  <script>
+    // --- ESTADO DA APLICAÇÃO ---
+    let currentSlide = 0;
+
+    // Dados Elaborados dos Slides de Segurança do Trabalho
+    const slidesData = [
+      {
+        tag: "INTRODUÇÃO & DIRETRIZES",
+        title: "Cultura de Segurança Preventiva",
+        subtitle: "Treinamento Obrigatório de Integração e Conscientização em SST",
+        content: `
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 my-4">
+            <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl border-l-4 border-l-emerald-500">
+              <i class="fa-solid fa-user-shield text-2xl text-emerald-400 mb-2"></i>
+              <h4 class="font-bold text-white text-sm">Compromisso Individual</h4>
+              <p class="text-xs text-slate-400 mt-1">A segurança começa nas atitudes de cada colaborador. Inspeções de EPIs são diárias e obrigatórias.</p>
+            </div>
+            <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl border-l-4 border-l-blue-500">
+              <i class="fa-solid fa-triangle-exclamation text-2xl text-blue-400 mb-2"></i>
+              <h4 class="font-bold text-white text-sm">Direito de Recusa</h4>
+              <p class="text-xs text-slate-400 mt-1">É garantido o direito de interromper tarefas caso haja risco grave ou iminente não controlado.</p>
+            </div>
+            <div class="bg-slate-900 border border-slate-800 p-5 rounded-xl border-l-4 border-l-amber-500">
+              <i class="fa-solid fa-bullhorn text-2xl text-amber-400 mb-2"></i>
+              <h4 class="font-bold text-white text-sm">Comunicação Imediata</h4>
+              <p class="text-xs text-slate-400 mt-1">Qualquer incidente ou Quase-Acidente deve ser comunicado ao Eng. João Pedro Caxias imediatamente.</p>
+            </div>
+          </div>
+        `
+      },
+      {
+        tag: "NR-06 | EQUIPAMENTOS DE PROTEÇÃO",
+        title: "Equipamentos de Proteção (EPI e EPC)",
+        subtitle: "Uso, Manutenção e Guarda de Equipamentos Obrigatórios",
+        content: `
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 my-4">
+            <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-xl">
+              <h4 class="font-bold text-emerald-400 text-sm mb-3 flex items-center gap-2"><i class="fa-solid fa-hard-hat"></i> EPIs de Uso Obrigatório</h4>
+              <ul class="space-y-2 text-xs text-slate-300">
+                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i> Capacete com jugular para áreas operacionais</li>
+                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i> Calçado de segurança com biqueira de composite</li>
+                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i> Óculos de proteção e protetor auditivo (Plug/Concha)</li>
+                <li class="flex items-center gap-2"><i class="fa-solid fa-check text-emerald-500"></i> Luvas específicas de acordo com o risco da tarefa</li>
+              </ul>
+            </div>
+            <div class="bg-slate-900/80 border border-slate-800 p-4 rounded-xl">
+              <h4 class="font-bold text-blue-400 text-sm mb-3 flex items-center gap-2"><i class="fa-solid fa-shield-virus"></i> Requisitos de Validade e Troca</h4>
+              <p class="text-xs text-slate-400 mb-3">Todos os equipamentos possuem Certificado de Aprovação (CA) válido e inspeção periódica registrada.</p>
+              <div class="p-3 bg-slate-800 rounded-lg border border-slate-700 text-xs text-slate-300">
+                <strong>Substituição:</strong> EPIs danificados ou desgastados devem ser trocados no almoxarifado técnico com autorização da supervisão.
+              </div>
+            </div>
+          </div>
+        `
+      },
+      {
+        tag: "NR-35 | ALTURA & PERIGOS CRÍTICOS",
+        title: "Trabalho em Altura e Permissão de Trabalho (PT)",
+        subtitle: "Regras Essenciais para Atividades Acima de 2.00 Metros",
+        content: `
+          <div class="space-y-4 my-2">
+            <div class="bg-amber-950/40 border border-amber-800/60 p-4 rounded-xl flex items-start gap-4">
+              <i class="fa-solid fa-triangle-exclamation text-amber-400 text-3xl mt-1"></i>
+              <div>
+                <h4 class="font-bold text-amber-300 text-sm">Exigência de Análise Preliminar de Risco (APR)</h4>
+                <p class="text-xs text-amber-200/70 mt-1">Nenhum trabalho em altura pode ser iniciado sem a emissão prévia da Permissão de Trabalho (PT) devidamente assinada.</p>
+              </div>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs">
+              <div class="bg-slate-900 p-3 rounded-lg border border-slate-800">
+                <span class="text-emerald-400 font-bold block mb-1">01. Cinto Paraquedista</span>
+                Verificação de costuras, mosquetões e ponto de ancoragem antes da subida.
+              </div>
+              <div class="bg-slate-900 p-3 rounded-lg border border-slate-800">
+                <span class="text-emerald-400 font-bold block mb-1">02. Talabarte Duplo</span>
+                Uso constante de 100% de conexão em pontos de ancoragem certificados.
+              </div>
+              <div class="bg-slate-900 p-3 rounded-lg border border-slate-800">
+                <span class="text-emerald-400 font-bold block mb-1">03. Linha de Vida</span>
+                Inspeção dos cabos de aço e trava-quedas de resgate.
+              </div>
+            </div>
+          </div>
+        `
+      },
+      {
+        tag: "EMERGÊNCIAS & FLUXOGRAMA",
+        title: "Procedimentos de Emergência e Evacuação",
+        subtitle: "Como Agir em Casos de Acidentes ou Princípios de Incêndio",
+        content: `
+          <div class="grid grid-cols-1 md:grid-cols-4 gap-3 text-center my-4">
+            <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+              <div class="w-8 h-8 rounded-full bg-red-600 text-white font-bold flex items-center justify-center mx-auto mb-2 text-sm">1</div>
+              <h5 class="font-bold text-white text-xs">Manter a Calma</h5>
+              <p class="text-[11px] text-slate-400 mt-1">Interromper a atividade com segurança.</p>
+            </div>
+            <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+              <div class="w-8 h-8 rounded-full bg-amber-600 text-white font-bold flex items-center justify-center mx-auto mb-2 text-sm">2</div>
+              <h5 class="font-bold text-white text-xs">Acionar Alarme</h5>
+              <p class="text-[11px] text-slate-400 mt-1">Notificar a brigada de emergência local.</p>
+            </div>
+            <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+              <div class="w-8 h-8 rounded-full bg-blue-600 text-white font-bold flex items-center justify-center mx-auto mb-2 text-sm">3</div>
+              <h5 class="font-bold text-white text-xs">Ponto de Encontro</h5>
+              <p class="text-[11px] text-slate-400 mt-1">Dirigir-se pelas rotas de fuga sinalizadas.</p>
+            </div>
+            <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+              <div class="w-8 h-8 rounded-full bg-emerald-600 text-white font-bold flex items-center justify-center mx-auto mb-2 text-sm">4</div>
+              <h5 class="font-bold text-white text-xs">Contagem de Pessoal</h5>
+              <p class="text-[11px] text-slate-400 mt-1">Aguardar instruções do Eng. João Pedro Caxias.</p>
+            </div>
+          </div>
+        `
+      },
+      {
+        tag: "ENCERRAMENTO & AVALIAÇÃO",
+        title: "Compromisso com a Vida",
+        subtitle: "SafeWork SST - Trabalho Seguro, Retorno Seguro para Casa",
+        content: `
+          <div class="text-center my-6 space-y-4 max-w-xl mx-auto">
+            <i class="fa-solid fa-heart-pulse text-5xl text-emerald-400 animate-pulse"></i>
+            <h4 class="text-lg font-bold text-white">Nenhum trabalho é tão urgente que não possa ser feito com segurança.</h4>
+            <p class="text-xs text-slate-400">Ao assinar a ata desta formação, o colaborador declara-se apto e ciente de todas as diretrizes expostas pelo coordenador de SST.</p>
+            <div class="pt-4 flex justify-center gap-4">
+              <button onclick="navigate('checklist')" class="bg-emerald-500 hover:bg-emerald-600 text-slate-950 font-bold px-4 py-2 rounded-lg text-xs transition">
+                Abrir Checklist Prático
+              </button>
+            </div>
+          </div>
+        `
+      }
+    ];
+
+    // Checklist Dinâmico com Persistência Local
+    const defaultChecklist = [
+      { id: 1, title: "Inspeção de capacetes e protetores auriculares", status: true },
+      { id: 2, title: "Verificação dos extintores de incêndio do setor", status: false },
+      { id: 3, title: "Assinatura da Permissão de Trabalho (PT) em Altura", status: false },
+      { id: 4, title: "Checagem de isolamento e sinalização de área", status: true },
+      { id: 5, title: "Validação do kit de primeiros socorros", status: false }
+    ];
+
+    let checklistItems = JSON.parse(localStorage.getItem('safework_checklist')) || defaultChecklist;
+
+    // --- NAVEGAÇÃO DE PÁGINAS (SPA) ---
+    function navigate(pageId) {
+      // Ocultar todas as páginas
+      const pages = ['overview', 'integration', 'contents', 'instructor', 'checklist', 'about', 'powerpoint'];
+      pages.forEach(p => {
+        document.getElementById(`page-${p}`).classList.add('hidden');
+        const navBtn = document.getElementById(`nav-${p}`);
+        if(navBtn) {
+          navBtn.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-slate-400 hover:text-white hover:bg-slate-800 transition-colors";
+        }
+      });
+
+      // Mostrar página selecionada
+      const activePage = document.getElementById(`page-${pageId}`);
+      if(activePage) activePage.classList.remove('hidden');
+
+      // Atualizar Botão do Menu
+      const activeNav = document.getElementById(`nav-${pageId}`);
+      if(activeNav) {
+        activeNav.className = "w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors bg-emerald-600 text-white";
+      }
+
+      // Atualizar Títulos da Topbar
+      const pageTitles = {
+        'overview': ['Visão Geral do Sistema', 'Painel Principal de Controlo de Segurança no Trabalho'],
+        'integration': ['Integração de Colaboradores', 'Registo e Integração Obrigatória em SST'],
+        'contents': ['Conteúdos e Módulos', 'Programa Didático e Normas Regulamentadoras'],
+        'instructor': ['Roteiro do Instrutor', 'Instruções e Guia Pedagógico de Segurança'],
+        'checklist': ['Lista de Verificação', 'Verificação Prática e Auditoria diária de Campo'],
+        'about': ['Sobre o Projeto', 'Informações sobre a Plataforma SafeWork SST'],
+        'powerpoint': ['Apresentação PowerPoint SST', 'Módulo de Treinamento Interativo de Segurança']
+      };
+
+      if(pageTitles[pageId]) {
+        document.getElementById('page-title').innerText = pageTitles[pageId][0];
+        document.getElementById('page-subtitle').innerText = pageTitles[pageId][1];
+      }
+
+      // Inicializar Componentes Específicos
+      if(pageId === 'powerpoint') renderSlide();
+      if(pageId === 'checklist') renderChecklist();
+    }
+
+    // --- LÓGICA DOS SLIDES POWERPOINT ---
+    function renderSlide() {
+      const slide = slidesData[currentSlide];
+      document.getElementById('current-slide-num').innerText = currentSlide + 1;
+      document.getElementById('total-slides-num').innerText = slidesData.length;
+      document.getElementById('slide-title-header').innerText = slide.title;
+
+      const body = document.getElementById('slide-content-body');
+      body.innerHTML = `
+        <div class="slide-card">
+          <span class="text-[10px] font-bold tracking-wider text-emerald-400 bg-emerald-950/80 border border-emerald-800 px-2.5 py-1 rounded-full uppercase inline-block mb-3">
+            ${slide.tag}
+          </span>
+          <h2 class="text-2xl font-extrabold text-white leading-tight">${slide.title}</h2>
+          <p class="text-xs text-slate-400 mt-1 mb-4">${slide.subtitle}</p>
+          ${slide.content}
+        </div>
+      `;
+
+      // Dots Pagination
+      const dotsContainer = document.getElementById('slide-dots');
+      dotsContainer.innerHTML = '';
+      slidesData.forEach((_, idx) => {
+        const dot = document.createElement('button');
+        dot.className = `w-2.5 h-2.5 rounded-full transition-all ${idx === currentSlide ? 'bg-emerald-500 w-6' : 'bg-slate-700 hover:bg-slate-500'}`;
+        dot.onclick = () => { currentSlide = idx; renderSlide(); };
+        dotsContainer.appendChild(dot);
+      });
+    }
+
+    function nextSlide() {
+      if(currentSlide < slidesData.length - 1) {
+        currentSlide++;
+        renderSlide();
+      } else {
+        currentSlide = 0; // Loop
+        renderSlide();
+      }
+    }
+
+    function prevSlide() {
+      if(currentSlide > 0) {
+        currentSlide--;
+        renderSlide();
+      }
+    }
+
+    // --- LÓGICA DO CHECKLIST (LOCALSTORAGE) ---
+    function renderChecklist() {
+      const container = document.getElementById('checklist-container');
+      container.innerHTML = '';
+
+      checklistItems.forEach(item => {
+        const div = document.createElement('div');
+        div.className = `p-3.5 rounded-lg border flex items-center justify-between transition-all ${item.status ? 'bg-emerald-50/50 border-emerald-200' : 'bg-white border-gray-200'}`;
+        div.innerHTML = `
+          <label class="flex items-center gap-3 cursor-pointer w-full">
+            <input type="checkbox" ${item.status ? 'checked' : ''} onchange="toggleChecklist(${item.id})" class="h-4 w-4 text-emerald-600 rounded focus:ring-emerald-500">
+            <span class="text-sm font-medium ${item.status ? 'line-through text-gray-400' : 'text-gray-700'}">${item.title}</span>
+          </label>
+          <span class="text-xs font-bold ${item.status ? 'text-emerald-600' : 'text-amber-600'}">${item.status ? 'OK' : 'Pendente'}</span>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function toggleChecklist(id) {
+      checklistItems = checklistItems.map(item => item.id === id ? { ...item, status: !item.status } : item);
+      localStorage.setItem('safework_checklist', JSON.stringify(checklistItems));
+      renderChecklist();
+    }
+
+    // --- INICIALIZAÇÃO DE GRÁFICOS ---
+    window.onload = function() {
+      const ctx = document.getElementById('sstChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun'],
+          datasets: [
+            {
+              label: 'Treinamentos Realizados',
+              data: [12, 19, 15, 22, 18, 24],
+              backgroundColor: '#10b981',
+              borderRadius: 6
+            },
+            {
+              label: 'Incidentes / Quase-Acidentes',
+              data: [2, 1, 0, 1, 0, 0],
+              backgroundColor: '#f59e0b',
+              borderRadius: 6
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position: 'bottom' }
+          },
+          scales: {
+            y: { beginAtZero: true }
+          }
+        }
+      });
+    };
+  </script>
+</body>
+</html>
